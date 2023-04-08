@@ -1,18 +1,22 @@
 package com.klopoff.messenger_klopoff.HomeActivity.ChatFragment
 
 import android.app.Activity
-import android.content.Context
-import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
+import android.widget.LinearLayout
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
+import androidx.core.view.marginBottom
+import androidx.core.view.setMargins
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.klopoff.messenger_klopoff.HomeActivity.ChatsFragment.Chat
+import com.klopoff.messenger_klopoff.Utils.BottomNavigationSupport
 import com.klopoff.messenger_klopoff.Utils.DispatchableTouchEventFragment
 import com.klopoff.messenger_klopoff.Utils.MarginItemDecoration
 import com.klopoff.messenger_klopoff.Utils.SoftKeyboardUtils
@@ -21,9 +25,10 @@ import java.util.*
 
 private const val CHAT_PARAM = "CHAT"
 
-class ChatFragment : Fragment(), DispatchableTouchEventFragment {
+class ChatFragment : Fragment(), DispatchableTouchEventFragment, BottomNavigationSupport {
 
     private lateinit var binding: FragmentChatBinding
+    private var parentBottomNavigation: BottomNavigationView? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -53,12 +58,6 @@ class ChatFragment : Fragment(), DispatchableTouchEventFragment {
             }
         })
 
-        binding.textInputEditMessage.setOnFocusChangeListener { v, hasFocus ->
-            if (!hasFocus && activity != null) {
-                SoftKeyboardUtils.hideSoftKeyboard(requireActivity())
-            }
-        }
-
         return binding.root
     }
 
@@ -68,6 +67,10 @@ class ChatFragment : Fragment(), DispatchableTouchEventFragment {
             SoftKeyboardUtils.hideSoftKeyboard(activity)
         }
         return false
+    }
+
+    override fun onBottomNavigationProvided(bottomNavigation: BottomNavigationView) {
+        parentBottomNavigation = bottomNavigation
     }
 
     private fun getDummyMessages(): List<ChatMessage> {

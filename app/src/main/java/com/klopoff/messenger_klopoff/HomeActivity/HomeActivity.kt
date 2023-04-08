@@ -10,6 +10,7 @@ import com.klopoff.messenger_klopoff.HomeActivity.ChatFragment.ChatFragment
 import com.klopoff.messenger_klopoff.HomeActivity.ChatsFragment.Chat
 import com.klopoff.messenger_klopoff.HomeActivity.ChatsFragment.ChatsFragment
 import com.klopoff.messenger_klopoff.R
+import com.klopoff.messenger_klopoff.Utils.BottomNavigationSupport
 import com.klopoff.messenger_klopoff.Utils.DispatchableTouchEventFragment
 import com.klopoff.messenger_klopoff.databinding.ActivityHomeBinding
 import dev.chrisbanes.insetter.applyInsetter
@@ -56,6 +57,7 @@ class HomeActivity : AppCompatActivity() {
             R.id.itemSettings -> SettingsFragment.newInstance()
             else -> throw Exception("Out of bottom navigation items")
         }
+
         supportFragmentManager.popBackStack()
         supportFragmentManager.commit {
             replace(R.id.fragmentContainerView, nextFragment)
@@ -63,10 +65,17 @@ class HomeActivity : AppCompatActivity() {
         return true
     }
 
-    private fun onChatItemClick(it: Chat) {
+    private fun onChatItemClick(chat: Chat) {
+        val chatFragment = ChatFragment.newInstance(chat)
+
+        if (chatFragment is BottomNavigationSupport) {
+            val bottomNavigationSupport = chatFragment as BottomNavigationSupport
+            bottomNavigationSupport.onBottomNavigationProvided(binding.bottomNavigation)
+        }
+
         supportFragmentManager.commit {
             addToBackStack("CHAT_FRAGMENT")
-            replace(R.id.fragmentContainerView, ChatFragment.newInstance(it))
+            replace(R.id.fragmentContainerView, chatFragment)
         }
     }
 
