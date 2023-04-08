@@ -56,6 +56,7 @@ class HomeActivity : AppCompatActivity() {
             R.id.itemSettings -> SettingsFragment.newInstance()
             else -> throw Exception("Out of bottom navigation items")
         }
+        supportFragmentManager.popBackStack()
         supportFragmentManager.commit {
             replace(R.id.fragmentContainerView, nextFragment)
         }
@@ -64,7 +65,7 @@ class HomeActivity : AppCompatActivity() {
 
     private fun onChatItemClick(it: Chat) {
         supportFragmentManager.commit {
-            addToBackStack(null)
+            addToBackStack("CHAT_FRAGMENT")
             replace(R.id.fragmentContainerView, ChatFragment.newInstance(it))
         }
     }
