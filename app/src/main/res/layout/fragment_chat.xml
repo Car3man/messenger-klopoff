@@ -24,24 +24,27 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@color/white"
-        app:boxCornerRadiusBottomStart="0dp"
         app:boxCornerRadiusBottomEnd="0dp"
-        app:boxCornerRadiusTopStart="0dp"
+        app:boxCornerRadiusBottomStart="0dp"
         app:boxCornerRadiusTopEnd="0dp"
-        app:boxStrokeWidth="0dp"
+        app:boxCornerRadiusTopStart="0dp"
         app:boxStrokeColor="@android:color/transparent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:boxStrokeWidth="0dp"
+        app:endIconContentDescription="@string/send_message"
+        app:endIconDrawable="@drawable/ic_send_message"
+        app:endIconMode="custom"
+        app:endIconTint="?attr/colorSurfaceVariant"
+        app:hintEnabled="false"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:hintEnabled="false">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/textInputEditMessage"
-            android:inputType="textMultiLine|textAutoCorrect"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/message"
-            />
+            android:inputType="textMultiLine|textAutoCorrect" />
 
     </com.google.android.material.textfield.TextInputLayout>
 

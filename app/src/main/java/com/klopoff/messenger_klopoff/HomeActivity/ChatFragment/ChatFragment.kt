@@ -6,9 +6,7 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import androidx.constraintlayout.widget.ConstraintLayout.LayoutParams
 import androidx.core.view.isGone
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
@@ -69,14 +67,20 @@ class ChatFragment : Fragment(), DispatchableTouchEventFragment, BottomNavigatio
 
         // Hide parent bottom navigation bar if soft keyboard is active
         // Else show it but in small delay to prevent ui render glitches
-        binding.textInputEditMessage.setOnFocusChangeListener { v, hasFocus ->
+        binding.textInputEditMessage.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) parentBottomNavigation!!.isGone = true
             else {
                 lifecycleScope.launch {
                     delay(100)
-                    parentBottomNavigation!!.isGone = false
+                    if (!binding.textInputEditMessage.hasFocus()) {
+                        parentBottomNavigation!!.isGone = false
+                    }
                 }
             }
+        }
+
+        binding.textInputMessage.setEndIconOnClickListener {
+            // TODO: Send message
         }
 
         return binding.root
