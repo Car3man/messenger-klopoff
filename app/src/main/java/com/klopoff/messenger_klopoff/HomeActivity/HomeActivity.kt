@@ -2,6 +2,7 @@ package com.klopoff.messenger_klopoff.HomeActivity
 
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.MotionEvent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.fragment.app.commit
@@ -9,6 +10,7 @@ import com.klopoff.messenger_klopoff.HomeActivity.ChatFragment.ChatFragment
 import com.klopoff.messenger_klopoff.HomeActivity.ChatsFragment.Chat
 import com.klopoff.messenger_klopoff.HomeActivity.ChatsFragment.ChatsFragment
 import com.klopoff.messenger_klopoff.R
+import com.klopoff.messenger_klopoff.Utils.DispatchableTouchEventFragment
 import com.klopoff.messenger_klopoff.databinding.ActivityHomeBinding
 import dev.chrisbanes.insetter.applyInsetter
 
@@ -65,5 +67,14 @@ class HomeActivity : AppCompatActivity() {
             addToBackStack(null)
             replace(R.id.fragmentContainerView, ChatFragment.newInstance(it))
         }
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        val fragments = supportFragmentManager.fragments
+        if (fragments.size > 0 && fragments[fragments.size - 1] is DispatchableTouchEventFragment) {
+            val fragment = fragments[fragments.size - 1] as DispatchableTouchEventFragment
+            if (fragment.dispatchTouchEvent(this, ev)) return true
+        }
+        return super.dispatchTouchEvent(ev)
     }
 }

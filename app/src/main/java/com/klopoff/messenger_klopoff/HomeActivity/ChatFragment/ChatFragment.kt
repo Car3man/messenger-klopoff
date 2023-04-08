@@ -1,26 +1,35 @@
 package com.klopoff.messenger_klopoff.HomeActivity.ChatFragment
 
+import android.app.Activity
+import android.content.Context
+import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.klopoff.messenger_klopoff.HomeActivity.ChatsFragment.Chat
+import com.klopoff.messenger_klopoff.Utils.DispatchableTouchEventFragment
 import com.klopoff.messenger_klopoff.Utils.MarginItemDecoration
+import com.klopoff.messenger_klopoff.Utils.SoftKeyboardUtils
 import com.klopoff.messenger_klopoff.databinding.FragmentChatBinding
 import java.util.*
 
 private const val CHAT_PARAM = "CHAT"
 
-class ChatFragment : Fragment() {
+class ChatFragment : Fragment(), DispatchableTouchEventFragment {
+
+    private lateinit var binding: FragmentChatBinding
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val binding = FragmentChatBinding.inflate(inflater, container, false)
+        binding = FragmentChatBinding.inflate(inflater, container, false)
 
         val messages = getDummyMessages()
         val adapter = ChatMessageAdapter(messages)
@@ -44,7 +53,21 @@ class ChatFragment : Fragment() {
             }
         })
 
+        binding.textInputEditMessage.setOnFocusChangeListener { v, hasFocus ->
+            if (!hasFocus && activity != null) {
+                SoftKeyboardUtils.hideSoftKeyboard(requireActivity())
+            }
+        }
+
         return binding.root
+    }
+
+    override fun dispatchTouchEvent(activity: Activity, event: MotionEvent) : Boolean {
+        if (activity.currentFocus != null) {
+            binding.textInputEditMessage.clearFocus()
+            SoftKeyboardUtils.hideSoftKeyboard(activity)
+        }
+        return false
     }
 
     private fun getDummyMessages(): List<ChatMessage> {

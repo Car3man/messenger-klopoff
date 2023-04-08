@@ -24,4 +24,5 @@
     <string name="profile">Profile</string>
     <string name="user_avatar">User avatar</string>
     <string name="no_messages">Нет сообщений</string>
+    <string name="message">Сообщение</string>
 </resources>

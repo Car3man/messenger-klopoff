@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.klopoff.messenger_klopoff.Utils.MarginItemDecoration
-import com.klopoff.messenger_klopoff.databinding.FragmentChatBinding
+import com.klopoff.messenger_klopoff.databinding.FragmentChatsBinding
 
 class ChatsFragment : Fragment() {
 
@@ -17,7 +17,7 @@ class ChatsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val binding = FragmentChatBinding.inflate(inflater, container, false)
+        val binding = FragmentChatsBinding.inflate(inflater, container, false)
 
         val chats = getDummyChats()
         val adapter = ChatAdapter(binding.root, chats)
