@@ -1,11 +1,8 @@
-package com.klopoff.messenger_klopoff.HomeActivity.ChatsFragment
+package com.klopoff.messenger_klopoff.HomeActivity.ChatFragment
 
-import android.content.Context
-import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.klopoff.messenger_klopoff.databinding.ItemChatMessageBinding
 import com.klopoff.messenger_klopoff.databinding.ItemChatMessageOtherBinding
@@ -15,9 +12,9 @@ import java.util.*
 
 class ChatMessageAdapter(
     private val messages: List<ChatMessage>
-) : RecyclerView.Adapter<ChatMessageAdapter.ItemChatMessageViewHolder>() {
+) : RecyclerView.Adapter<ChatMessageAdapter.ViewHolder>() {
 
-    inner class ItemChatMessageViewHolder(
+    inner class ViewHolder(
         itemView: View,
         private var itemBinding: ItemChatMessageBinding?,
         private var itemOtherBinding: ItemChatMessageOtherBinding?
@@ -25,9 +22,9 @@ class ChatMessageAdapter(
         constructor(itemBinding: ItemChatMessageBinding) : this(itemBinding.root, itemBinding, null)
         constructor(itemOtherBinding: ItemChatMessageOtherBinding) : this(itemOtherBinding.root, null, itemOtherBinding)
 
-        fun bind(msg: ChatMessage) {
+        fun bind(chatMessage: ChatMessage) {
             val dateFormat = SimpleDateFormat("h:mm a", Locale.getDefault())
-            with (msg) {
+            with (chatMessage) {
                 if (mine) {
                     itemBinding!!.tvMessage.text = message
                     itemBinding!!.tvTime.text = dateFormat.format(Date(createdAt)).toString()
@@ -39,17 +36,17 @@ class ChatMessageAdapter(
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatMessageAdapter.ItemChatMessageViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatMessageAdapter.ViewHolder {
         return if (viewType == 0) {
             val view = ItemChatMessageBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-            ItemChatMessageViewHolder(view)
+            ViewHolder(view)
         } else {
             val view = ItemChatMessageOtherBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-            ItemChatMessageViewHolder(view)
+            ViewHolder(view)
         }
     }
 
-    override fun onBindViewHolder(holder: ChatMessageAdapter.ItemChatMessageViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ChatMessageAdapter.ViewHolder, position: Int) {
         val message = messages[position]
         holder.bind(message)
     }

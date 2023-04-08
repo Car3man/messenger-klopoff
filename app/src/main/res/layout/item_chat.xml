@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="80dp"
+    android:clickable="true"
+    android:foreground="?attr/selectableItemBackground"
+    app:cardBackgroundColor="@android:color/transparent"
+    app:cardElevation="0dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/ivAvatar"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:background="#EAEAEA"
+            android:contentDescription="@string/user_avatar"
+            android:src="@drawable/ic_avatar_placeholder"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="H,1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvUsername"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="8dp"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/tvLastMessage"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/ivAvatar"
+            app:layout_constraintTop_toTopOf="@id/ivAvatar"
+            app:layout_constraintVertical_chainStyle="packed"
+            tools:text="Username" />
+
+        <TextView
+            android:id="@+id/tvLastMessage"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:alpha="0.6"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="@id/ivAvatar"
+            app:layout_constraintEnd_toEndOf="@id/tvUsername"
+            app:layout_constraintStart_toStartOf="@id/tvUsername"
+            app:layout_constraintTop_toBottomOf="@id/tvUsername"
+            tools:text="Username" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.cardview.widget.CardView>
