@@ -16,7 +16,7 @@ import com.klopoff.messenger_klopoff.HomeActivity.ChatsFragment.Chat
 import com.klopoff.messenger_klopoff.Utils.BottomNavigationSupport
 import com.klopoff.messenger_klopoff.Utils.DispatchableTouchEventFragment
 import com.klopoff.messenger_klopoff.Utils.MarginItemDecoration
-import com.klopoff.messenger_klopoff.Utils.SoftKeyboardUtils
+import com.klopoff.messenger_klopoff.Utils.Utils
 import com.klopoff.messenger_klopoff.databinding.FragmentChatBinding
 import dev.chrisbanes.insetter.applyInsetter
 import kotlinx.coroutines.delay
@@ -88,8 +88,10 @@ class ChatFragment : Fragment(), DispatchableTouchEventFragment, BottomNavigatio
 
     override fun dispatchTouchEvent(activity: Activity, event: MotionEvent) : Boolean {
         if (activity.currentFocus != null) {
-            binding.textInputEditMessage.clearFocus()
-            SoftKeyboardUtils.hideSoftKeyboard(activity)
+            if (!Utils.isPointInsideView(event.rawX.toInt(), event.rawY.toInt(), binding.textInputEditMessage)) {
+                binding.textInputEditMessage.clearFocus()
+                Utils.hideSoftKeyboard(activity)
+            }
         }
         return false
     }
