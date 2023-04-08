@@ -6,12 +6,11 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
+import androidx.constraintlayout.widget.ConstraintLayout.LayoutParams
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.core.view.marginBottom
-import androidx.core.view.setMargins
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -21,6 +20,9 @@ import com.klopoff.messenger_klopoff.Utils.DispatchableTouchEventFragment
 import com.klopoff.messenger_klopoff.Utils.MarginItemDecoration
 import com.klopoff.messenger_klopoff.Utils.SoftKeyboardUtils
 import com.klopoff.messenger_klopoff.databinding.FragmentChatBinding
+import dev.chrisbanes.insetter.applyInsetter
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.util.*
 
 private const val CHAT_PARAM = "CHAT"
@@ -57,6 +59,25 @@ class ChatFragment : Fragment(), DispatchableTouchEventFragment, BottomNavigatio
                 // TODO: load more items
             }
         })
+
+        // Apply padding to input field if soft keyboard is active
+        binding.textInputMessage.applyInsetter {
+            type (ime = true) {
+                padding()
+            }
+        }
+
+        // Hide parent bottom navigation bar if soft keyboard is active
+        // Else show it but in small delay to prevent ui render glitches
+        binding.textInputEditMessage.setOnFocusChangeListener { v, hasFocus ->
+            if (hasFocus) parentBottomNavigation!!.isGone = true
+            else {
+                lifecycleScope.launch {
+                    delay(100)
+                    parentBottomNavigation!!.isGone = false
+                }
+            }
+        }
 
         return binding.root
     }

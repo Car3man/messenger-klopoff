@@ -67,14 +67,11 @@ class HomeActivity : AppCompatActivity() {
 
     private fun onChatItemClick(chat: Chat) {
         val chatFragment = ChatFragment.newInstance(chat)
-
-        if (chatFragment is BottomNavigationSupport) {
-            val bottomNavigationSupport = chatFragment as BottomNavigationSupport
-            bottomNavigationSupport.onBottomNavigationProvided(binding.bottomNavigation)
-        }
+        val bottomNavigationSupport = chatFragment as BottomNavigationSupport
+        bottomNavigationSupport.onBottomNavigationProvided(binding.bottomNavigation)
 
         supportFragmentManager.commit {
-            addToBackStack("CHAT_FRAGMENT")
+            addToBackStack(null)
             replace(R.id.fragmentContainerView, chatFragment)
         }
     }
