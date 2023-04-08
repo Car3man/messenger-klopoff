@@ -11,6 +11,7 @@ class Chat(
     val userAvatar: Bitmap?,
     val lastMessage: ChatMessage?
 ): Parcelable {
+
     override fun describeContents(): Int {
         return 0
     }

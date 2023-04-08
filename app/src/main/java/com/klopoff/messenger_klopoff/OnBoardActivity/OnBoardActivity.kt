@@ -13,6 +13,7 @@ import com.klopoff.messenger_klopoff.SignInActivity
 import com.klopoff.messenger_klopoff.databinding.ActivityOnboardBinding
 
 class OnBoardActivity : AppCompatActivity() {
+
     private lateinit var binding: ActivityOnboardBinding
     private lateinit var auth: FirebaseAuth
 

@@ -7,6 +7,7 @@ class ChatFragmentState(
     var userId: String,
     var messages: MutableList<ChatMessage>
 ): Parcelable {
+
     override fun describeContents(): Int {
         return 0
     }

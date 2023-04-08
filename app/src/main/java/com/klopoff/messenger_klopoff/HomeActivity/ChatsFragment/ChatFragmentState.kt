@@ -6,6 +6,7 @@ import android.os.Parcelable
 class ChatFragmentState(
 
 ) : Parcelable {
+
     override fun describeContents(): Int {
         return 0
     }

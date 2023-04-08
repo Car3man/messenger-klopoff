@@ -13,6 +13,7 @@ import com.klopoff.messenger_klopoff.databinding.ActivityHomeBinding
 import dev.chrisbanes.insetter.applyInsetter
 
 class HomeActivity : AppCompatActivity() {
+
     private lateinit var binding: ActivityHomeBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {

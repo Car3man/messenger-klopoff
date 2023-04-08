@@ -17,6 +17,7 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
 class SignInActivity : AppCompatActivity() {
+
     private lateinit var binding: ActivitySigninBinding
     private lateinit var auth: FirebaseAuth
 

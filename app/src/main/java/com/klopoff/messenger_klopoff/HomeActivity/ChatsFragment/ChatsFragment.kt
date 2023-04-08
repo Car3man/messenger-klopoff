@@ -6,9 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.klopoff.messenger_klopoff.Utils.MarginItemDecoration
 import com.klopoff.messenger_klopoff.databinding.FragmentChatBinding
 
 class ChatsFragment : Fragment() {
+
     private var itemClickListener: ChatItemListener? = null
 
     override fun onCreateView(
@@ -20,7 +22,13 @@ class ChatsFragment : Fragment() {
         val chats = getDummyChats()
         val adapter = ChatAdapter(binding.root, chats)
         adapter.setItemClickListener(itemClickListener)
-        binding.recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        val layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        binding.recyclerView.layoutManager = layoutManager
+        binding.recyclerView.addItemDecoration(
+            MarginItemDecoration(requireContext())
+                .setReverseLayout(layoutManager.reverseLayout)
+                .setVerticalMargin(16)
+        )
         binding.recyclerView.adapter = adapter
 
         return binding.root

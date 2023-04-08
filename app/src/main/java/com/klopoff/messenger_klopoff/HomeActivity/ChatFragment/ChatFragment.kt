@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.klopoff.messenger_klopoff.HomeActivity.ChatsFragment.Chat
+import com.klopoff.messenger_klopoff.Utils.MarginItemDecoration
 import com.klopoff.messenger_klopoff.databinding.FragmentChatBinding
 import java.util.*
 
@@ -26,6 +27,11 @@ class ChatFragment : Fragment() {
         val layoutManager = StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL)
         layoutManager.reverseLayout = true
         binding.recyclerView.layoutManager = layoutManager
+        binding.recyclerView.addItemDecoration(
+            MarginItemDecoration(requireContext())
+                .setReverseLayout(layoutManager.reverseLayout)
+                .setVerticalMargin(8)
+        )
         binding.recyclerView.adapter = adapter
         binding.recyclerView.addOnScrollListener(object: RecyclerView.OnScrollListener() {
             val lastVisibleItemPositions = IntArray(1)
