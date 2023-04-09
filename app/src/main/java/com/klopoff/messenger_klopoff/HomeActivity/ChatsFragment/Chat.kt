@@ -6,11 +6,8 @@ import android.os.Parcelable
 import com.klopoff.messenger_klopoff.HomeActivity.ChatFragment.ChatMessage
 
 class Chat(
-    var userId: String,
-    var userName: String,
-    var userAvatar: Bitmap?,
-    var lastMessage: ChatMessage?
-): Parcelable {
+    var userId: String, var userName: String, var userAvatar: Bitmap?, var lastMessage: ChatMessage?
+) : Parcelable {
 
     override fun describeContents(): Int {
         return 0
@@ -25,7 +22,7 @@ class Chat(
         lastMessage?.writeToParcel(dest, flags)
     }
 
-    companion object CREATOR: Parcelable.Creator<Chat> {
+    companion object CREATOR : Parcelable.Creator<Chat> {
         override fun createFromParcel(`in`: Parcel): Chat {
             val userId = `in`.readString()!!
             val userName = `in`.readString()!!

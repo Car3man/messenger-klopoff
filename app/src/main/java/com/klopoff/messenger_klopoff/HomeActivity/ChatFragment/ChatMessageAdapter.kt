@@ -19,11 +19,13 @@ class ChatMessageAdapter(
         private var itemOtherBinding: ItemChatMessageOtherBinding?
     ) : RecyclerView.ViewHolder(itemView) {
         constructor(itemBinding: ItemChatMessageBinding) : this(itemBinding.root, itemBinding, null)
-        constructor(itemOtherBinding: ItemChatMessageOtherBinding) : this(itemOtherBinding.root, null, itemOtherBinding)
+        constructor(itemOtherBinding: ItemChatMessageOtherBinding) : this(
+            itemOtherBinding.root, null, itemOtherBinding
+        )
 
         fun bind(chatMessage: ChatMessage) {
             val dateFormat = SimpleDateFormat("h:mm a", Locale.getDefault())
-            with (chatMessage) {
+            with(chatMessage) {
                 if (mine) {
                     itemBinding!!.tvMessage.text = message
                     itemBinding!!.tvTime.text = dateFormat.format(Date(createdAt)).toString()
@@ -35,12 +37,17 @@ class ChatMessageAdapter(
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatMessageAdapter.ViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup, viewType: Int
+    ): ChatMessageAdapter.ViewHolder {
         return if (viewType == 0) {
-            val view = ItemChatMessageBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            val view =
+                ItemChatMessageBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             ViewHolder(view)
         } else {
-            val view = ItemChatMessageOtherBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            val view = ItemChatMessageOtherBinding.inflate(
+                LayoutInflater.from(parent.context), parent, false
+            )
             ViewHolder(view)
         }
     }

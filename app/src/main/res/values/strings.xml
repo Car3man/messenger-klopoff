@@ -29,4 +29,6 @@
     <string name="chats_fab">fab_contact</string>
     <string name="search">Search</string>
     <string name="nothing_found">Nothing found</string>
+    <string name="username_hint">Username</string>
+    <string name="invalid_username_error">You have entered invalid username</string>
 </resources>

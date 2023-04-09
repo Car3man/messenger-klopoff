@@ -10,23 +10,19 @@ import com.klopoff.messenger_klopoff.R
 class SettingsFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-        }
+        arguments?.let {}
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.fragment_settings, container, false)
     }
 
     companion object {
         @JvmStatic
-        fun newInstance() =
-            SettingsFragment().apply {
-                arguments = Bundle().apply {
-                }
-            }
+        fun newInstance() = SettingsFragment().apply {
+            arguments = Bundle().apply {}
+        }
     }
 }

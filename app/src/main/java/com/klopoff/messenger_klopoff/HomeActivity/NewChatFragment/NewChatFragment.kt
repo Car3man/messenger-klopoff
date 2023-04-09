@@ -19,13 +19,11 @@ import kotlinx.coroutines.tasks.await
 
 class NewChatFragment : Fragment() {
 
-    private lateinit var adapter: FoundedPersonAdapter
-    private var foundedUsers: MutableList<FoundedPerson> = mutableListOf()
-    private var foundedPersonClickListener: FoundedPersonItemClickListener? = null
+    private val foundedUsers: MutableList<FoundedPerson> = mutableListOf()
+    private val adapter: FoundedPersonAdapter = FoundedPersonAdapter(foundedUsers)
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         val binding = FragmentNewChatBinding.inflate(inflater, container, false)
 
@@ -43,17 +41,17 @@ class NewChatFragment : Fragment() {
                 .setReverseLayout(layoutManager.reverseLayout)
                 .setVerticalMargin(16)
         )
-        adapter = FoundedPersonAdapter(foundedUsers)
-        adapter.setItemClickListener(foundedPersonClickListener)
         binding.recyclerView.adapter = adapter
 
         // Auto start editing search input text on start
         lifecycleScope.launch {
             delay(100)
             binding.searchInputText.requestFocus()
-            val inputMethodManager: InputMethodManager =
-                requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            inputMethodManager.showSoftInput(binding.searchInputText, InputMethodManager.HIDE_IMPLICIT_ONLY)
+            val inputMethodManager: InputMethodManager = requireActivity()
+                .getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            inputMethodManager.showSoftInput(
+                binding.searchInputText, InputMethodManager.HIDE_IMPLICIT_ONLY
+            )
         }
 
         return binding.root
@@ -82,21 +80,22 @@ class NewChatFragment : Fragment() {
                     FoundedPerson(personUserId, personUserName, null)
                 }
 
+            foundedUsers.clear()
+            foundedUsers.addAll(persons)
+
             withContext(Dispatchers.Main) {
-                foundedUsers.addAll(persons)
                 adapter.notifyDataSetChanged()
             }
         }
     }
 
     fun setFoundedPersonClickListener(listener: FoundedPersonItemClickListener?) {
-        foundedPersonClickListener = listener
+        adapter.setItemClickListener(listener)
     }
 
     companion object {
         @JvmStatic
-        fun newInstance() =
-            NewChatFragment()
+        fun newInstance() = NewChatFragment()
     }
 
     interface FoundedPersonItemClickListener {

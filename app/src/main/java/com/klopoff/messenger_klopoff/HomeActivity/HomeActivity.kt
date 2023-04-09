@@ -74,7 +74,7 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun createChatsFragment(): ChatsFragment {
-        val chatsFragment = ChatsFragment.newInstance()
+        val chatsFragment = ChatsFragment.newInstance(this)
 
         chatsFragment.setChatItemClickListener(object : ChatsFragment.ChatItemClickListener {
             override fun onClick(chat: Chat) {
@@ -99,7 +99,14 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun createNewChatWithPerson(foundedPerson: FoundedPerson) {
-
+        supportFragmentManager.popBackStack().also {
+            onChatItemClick(Chat(
+                foundedPerson.userId,
+                foundedPerson.userName,
+                foundedPerson.userAvatar,
+                null)
+            )
+        }
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {

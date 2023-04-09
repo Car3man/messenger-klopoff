@@ -2,6 +2,7 @@ package com.klopoff.messenger_klopoff.OnBoardActivity
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.firebase.auth.FirebaseAuth
@@ -10,7 +11,10 @@ import com.google.firebase.ktx.Firebase
 import com.klopoff.messenger_klopoff.HomeActivity.HomeActivity
 import com.klopoff.messenger_klopoff.R
 import com.klopoff.messenger_klopoff.SignInActivity
+import com.klopoff.messenger_klopoff.SignUpActivity
 import com.klopoff.messenger_klopoff.databinding.ActivityOnboardBinding
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.tasks.await
 
 class OnBoardActivity : AppCompatActivity() {
 
@@ -25,11 +29,30 @@ class OnBoardActivity : AppCompatActivity() {
 
         // if we already login then switch to home activity
         if (currentUser != null) {
-            Intent(this, HomeActivity::class.java).also {
-                startActivity(it)
-                finish()
+            // check if maybe user deleted/disabled
+            // else start home immediately
+            var switchToHome = false
+
+            runBlocking {
+                try {
+                    currentUser.getIdToken(true).await()
+                    switchToHome = true
+                } catch (exception: Exception) {
+                    auth.signOut()
+                    Log.e(
+                        OnBoardActivity::class.java.name,
+                        "Refresh token exception: ${exception.message}"
+                    )
+                }
             }
-            return
+
+            if (switchToHome) {
+                Intent(this, HomeActivity::class.java).also {
+                    startActivity(it)
+                    finish()
+                }
+                return
+            }
         }
 
         val sharedPreferences = getSharedPreferences("USER", MODE_PRIVATE)
@@ -48,14 +71,36 @@ class OnBoardActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         val pages = mutableListOf<OnBoardPage>()
-        pages.add(OnBoardPage(R.drawable.onboard_page_thumbnail1, "First","First onBoard page short description"))
-        pages.add(OnBoardPage(R.drawable.onboard_page_thumbnail2, "Second","Second onBoard page short description"))
-        pages.add(OnBoardPage(R.drawable.onboard_page_thumbnail3, "Third","Third onBoard page short description"))
-        pages.add(OnBoardPage(R.drawable.onboard_page_thumbnail4, "Four","Four onBoard page short description"))
-        pages.add(OnBoardPage(R.drawable.onboard_page_thumbnail5, "Fifth","Fifth onBoard page short description"))
+        pages.add(
+            OnBoardPage(
+                R.drawable.onboard_page_thumbnail1, "First", "First onBoard page short description"
+            )
+        )
+        pages.add(
+            OnBoardPage(
+                R.drawable.onboard_page_thumbnail2,
+                "Second",
+                "Second onBoard page short description"
+            )
+        )
+        pages.add(
+            OnBoardPage(
+                R.drawable.onboard_page_thumbnail3, "Third", "Third onBoard page short description"
+            )
+        )
+        pages.add(
+            OnBoardPage(
+                R.drawable.onboard_page_thumbnail4, "Four", "Four onBoard page short description"
+            )
+        )
+        pages.add(
+            OnBoardPage(
+                R.drawable.onboard_page_thumbnail5, "Fifth", "Fifth onBoard page short description"
+            )
+        )
 
         binding.vpOnBoardPages.adapter = OnBoardPageAdapter(pages)
-        TabLayoutMediator(binding.tlOnBoardPages, binding.vpOnBoardPages) { _,_ -> }.attach()
+        TabLayoutMediator(binding.tlOnBoardPages, binding.vpOnBoardPages) { _, _ -> }.attach()
         binding.btnStartMessaging.setOnClickListener {
             val sharedPreferencesEditor = sharedPreferences.edit()
             sharedPreferencesEditor.putBoolean("FTUE", true)

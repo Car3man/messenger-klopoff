@@ -2,14 +2,19 @@ package com.klopoff.messenger_klopoff
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.klopoff.messenger_klopoff.HomeActivity.HomeActivity
 import com.klopoff.messenger_klopoff.Utils.isEmailValid
 import com.klopoff.messenger_klopoff.Utils.isPasswordValid
+import com.klopoff.messenger_klopoff.Utils.isUsernameValid
 import com.klopoff.messenger_klopoff.databinding.ActivitySignupBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -18,16 +23,17 @@ import kotlinx.coroutines.withContext
 
 class SignUpActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivitySignupBinding
     private lateinit var auth: FirebaseAuth
+    private lateinit var database: FirebaseDatabase
+    private lateinit var binding: ActivitySignupBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        auth = Firebase.auth
+        database = Firebase.database
 
         binding = ActivitySignupBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        auth = Firebase.auth
 
         binding.btnRegister.setOnClickListener { handleRegisterButton() }
         binding.btnSignUp.setOnClickListener { handleSignInButton() }
@@ -35,16 +41,23 @@ class SignUpActivity : AppCompatActivity() {
 
     private fun handleRegisterButton() {
         binding.tfEmail.error = null
+        binding.tfUsername.error = null
         binding.tfPassword.error = null
         binding.tfPasswordConfirm.error = null
         binding.tvError.text = ""
 
         val email = binding.tfEmail.editText!!.text.toString()
+        val username = binding.tfUsername.editText!!.text.toString()
         val password = binding.tfPassword.editText!!.text.toString()
         val passwordConfirm = binding.tfPasswordConfirm.editText!!.text.toString()
 
         if (!email.isEmailValid()) {
             binding.tfEmail.error = getString(R.string.invalid_email_error)
+            return
+        }
+
+        if (!username.isUsernameValid()) {
+            binding.tfUsername.error = getString(R.string.invalid_username_error)
             return
         }
 
@@ -59,8 +72,25 @@ class SignUpActivity : AppCompatActivity() {
         }
 
         lifecycleScope.launch {
+
             val authTask = auth.createUserWithEmailAndPassword(email, password)
-            authTask.await()
+            try {
+                authTask.await()
+
+                val setDisplayNameRequest: UserProfileChangeRequest =
+                    UserProfileChangeRequest.Builder().setDisplayName(username).build()
+                auth.currentUser!!.updateProfile(setDisplayNameRequest).await()
+            } catch (exception: Exception) {
+                Log.e(SignUpActivity::class.java.name, "Sign up exception: ${exception.message}")
+            }
+
+            if (authTask.isSuccessful) {
+                val user = authTask.result.user
+                database.reference.child("persons").child(user!!.uid).setValue(object {
+                        val userId = user.uid
+                        val userName = user.displayName
+                    }).await()
+            }
 
             withContext(Dispatchers.Main) {
                 if (authTask.isSuccessful) {

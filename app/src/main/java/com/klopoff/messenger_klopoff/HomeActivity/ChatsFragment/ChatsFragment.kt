@@ -1,6 +1,7 @@
 package com.klopoff.messenger_klopoff.HomeActivity.ChatsFragment
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,7 +10,10 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import com.klopoff.messenger_klopoff.Utils.MarginItemDecoration
 import com.klopoff.messenger_klopoff.databinding.FragmentChatsBinding
 import kotlinx.coroutines.Dispatchers
@@ -17,24 +21,17 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
-class ChatsFragment : Fragment() {
+class ChatsFragment private constructor(context: Context) : Fragment() {
 
-    private lateinit var auth: FirebaseAuth
-    private lateinit var database: FirebaseDatabase
-    private lateinit var adapter: ChatAdapter
-    private var chats: MutableList<Chat> = mutableListOf()
-    private var chatItemClickListener: ChatItemClickListener? = null
+    private val auth: FirebaseAuth = Firebase.auth
+    private val database: FirebaseDatabase = Firebase.database
+    private val chats: MutableList<Chat> = mutableListOf()
+    private val adapter: ChatAdapter = ChatAdapter(context, chats)
+
     private var newChatButtonClickListener: View.OnClickListener? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        auth = FirebaseAuth.getInstance()
-        database = FirebaseDatabase.getInstance()
-    }
-
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         val binding = FragmentChatsBinding.inflate(inflater, container, false)
 
@@ -45,11 +42,9 @@ class ChatsFragment : Fragment() {
                 .setReverseLayout(layoutManager.reverseLayout)
                 .setVerticalMargin(16)
         )
-        adapter = ChatAdapter(binding.root, chats)
-        adapter.setItemClickListener(chatItemClickListener)
         binding.recyclerView.adapter = adapter
 
-        newChatButtonClickListener?.let { binding.fabChats.setOnClickListener(it) }
+        binding.fabChats.setOnClickListener(newChatButtonClickListener)
 
         loadChats()
 
@@ -57,7 +52,7 @@ class ChatsFragment : Fragment() {
     }
 
     fun setChatItemClickListener(listener: ChatItemClickListener) {
-        chatItemClickListener = listener
+        adapter.setItemClickListener(listener)
     }
 
     fun setNewChatButtonClickListener(listener: View.OnClickListener) {
@@ -82,8 +77,7 @@ class ChatsFragment : Fragment() {
                         .child(userId!!)
                         .child("userName")
                         .get()
-                        .await()
-                        .value as String
+                        .await().value as String
                     Chat(userId, userName, null, null)
                 }
 
@@ -98,7 +92,7 @@ class ChatsFragment : Fragment() {
 
     companion object {
         @JvmStatic
-        fun newInstance() = ChatsFragment()
+        fun newInstance(context: Context) = ChatsFragment(context)
     }
 
     interface ChatItemClickListener {

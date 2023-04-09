@@ -4,9 +4,8 @@ import android.os.Parcel
 import android.os.Parcelable
 
 class ChatFragmentState(
-    var userId: String,
-    var messages: MutableList<ChatMessage>
-): Parcelable {
+    var userId: String, var messages: MutableList<ChatMessage>
+) : Parcelable {
 
     override fun describeContents(): Int {
         return 0
@@ -16,7 +15,7 @@ class ChatFragmentState(
         dest.writeString(userId)
     }
 
-    companion object CREATOR: Parcelable.Creator<ChatFragmentState> {
+    companion object CREATOR : Parcelable.Creator<ChatFragmentState> {
         override fun createFromParcel(`in`: Parcel): ChatFragmentState {
             val userId = `in`.readString()!!
             val messagesCount = `in`.readInt()

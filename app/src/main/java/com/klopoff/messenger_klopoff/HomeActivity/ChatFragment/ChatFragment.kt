@@ -13,10 +13,13 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import com.klopoff.messenger_klopoff.HomeActivity.ChatsFragment.Chat
 import com.klopoff.messenger_klopoff.Utils.BottomNavigationSupport
 import com.klopoff.messenger_klopoff.Utils.DispatchableTouchEventFragment
@@ -35,27 +38,27 @@ private const val CHAT_PARAM = "CHAT"
 
 class ChatFragment : Fragment(), DispatchableTouchEventFragment, BottomNavigationSupport {
 
-    private lateinit var auth: FirebaseAuth
-    private lateinit var database: FirebaseDatabase
-    private lateinit var adapter: ChatMessageAdapter
+    private val auth: FirebaseAuth = Firebase.auth
+    private val database: FirebaseDatabase = Firebase.database
+    private val messages: MutableList<ChatMessage> = mutableListOf()
+    private val adapter: ChatMessageAdapter = ChatMessageAdapter(messages)
+
     private lateinit var binding: FragmentChatBinding
     private lateinit var chat: Chat
-    private var messages: MutableList<ChatMessage> = mutableListOf()
+
     private var parentBottomNavigation: BottomNavigationView? = null
     private var chatUpdateListener: ChildEventListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         arguments?.let {
             chat = it.getParcelable(CHAT_PARAM)!!
         }
-        auth = FirebaseAuth.getInstance()
-        database = FirebaseDatabase.getInstance()
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         binding = FragmentChatBinding.inflate(inflater, container, false)
 
@@ -67,12 +70,11 @@ class ChatFragment : Fragment(), DispatchableTouchEventFragment, BottomNavigatio
                 .setReverseLayout(layoutManager.reverseLayout)
                 .setVerticalMargin(8)
         )
-        adapter = ChatMessageAdapter(messages)
         binding.recyclerView.adapter = adapter
 
         // Apply padding to input field if soft keyboard is active
         binding.textInputMessage.applyInsetter {
-            type (ime = true) {
+            type(ime = true) {
                 padding()
             }
         }
@@ -135,21 +137,22 @@ class ChatFragment : Fragment(), DispatchableTouchEventFragment, BottomNavigatio
 
     private fun loadMessages() {
         lifecycleScope.launch(Dispatchers.IO) {
-            val loadedMessages = database.reference
-                .child("chats")
-                .child(auth.uid!!)
-                .child(chat.userId)
-                .orderByKey()
-                .get()
-                .await()
-                .children
-                .map {
-                    val createdAt = it.key!!.toLong()
-                    val sender = it.child("sender").value as String
-                    val mine = sender == auth.uid!!
-                    val message = it.child("message").value as String
-                    ChatMessage(mine, message, createdAt)
-                }
+            val loadedMessages =
+                database.reference
+                    .child("chats")
+                    .child(auth.uid!!)
+                    .child(chat.userId)
+                    .orderByKey()
+                    .get()
+                    .await()
+                    .children
+                    .map {
+                        val createdAt = it.key!!.toLong()
+                        val sender = it.child("sender").value as String
+                        val mine = sender == auth.uid!!
+                        val message = it.child("message").value as String
+                        ChatMessage(mine, message, createdAt)
+                    }
 
             messages.clear()
             messages.addAll(loadedMessages.asReversed())
@@ -188,11 +191,11 @@ class ChatFragment : Fragment(), DispatchableTouchEventFragment, BottomNavigatio
                     }
                 }
 
-                override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) { }
+                override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
 
-                override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) { }
+                override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
 
-                override fun onCancelled(error: DatabaseError) { }
+                override fun onCancelled(error: DatabaseError) {}
             })
     }
 
@@ -204,9 +207,11 @@ class ChatFragment : Fragment(), DispatchableTouchEventFragment, BottomNavigatio
             .removeEventListener(chatUpdateListener!!)
     }
 
-    override fun dispatchTouchEvent(activity: Activity, event: MotionEvent) : Boolean {
+    override fun dispatchTouchEvent(activity: Activity, event: MotionEvent): Boolean {
         if (activity.currentFocus != null) {
-            if (!Utils.isPointInsideView(event.rawX.toInt(), event.rawY.toInt(), binding.textInputEditMessage)) {
+            val x = event.rawX.toInt()
+            val y = event.rawY.toInt()
+            if (!Utils.isPointInsideView(x, y, binding.textInputEditMessage)) {
                 binding.textInputEditMessage.clearFocus()
                 Utils.hideSoftKeyboard(activity)
             }
@@ -220,11 +225,10 @@ class ChatFragment : Fragment(), DispatchableTouchEventFragment, BottomNavigatio
 
     companion object {
         @JvmStatic
-        fun newInstance(chat: Chat) =
-            ChatFragment().apply {
-                arguments = Bundle().apply {
-                    putParcelable(CHAT_PARAM, chat)
-                }
+        fun newInstance(chat: Chat) = ChatFragment().apply {
+            arguments = Bundle().apply {
+                putParcelable(CHAT_PARAM, chat)
             }
+        }
     }
 }

@@ -3,6 +3,7 @@ package com.klopoff.messenger_klopoff
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import androidx.lifecycle.lifecycleScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -23,11 +24,10 @@ class SignInActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        auth = Firebase.auth
 
         binding = ActivitySigninBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        auth = Firebase.auth
 
         binding.btnLogin.setOnClickListener { handleLoginButton() }
         binding.btnSignUp.setOnClickListener { handleSignUpButton() }
@@ -53,7 +53,11 @@ class SignInActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             val authTask = auth.signInWithEmailAndPassword(email, password)
-            authTask.await()
+            try {
+                authTask.await()
+            } catch (exception: Exception) {
+                Log.e(SignInActivity::class.java.name, "Sign in exception: ${exception.message}")
+            }
 
             withContext(Dispatchers.Main) {
                 if (authTask.isSuccessful) {

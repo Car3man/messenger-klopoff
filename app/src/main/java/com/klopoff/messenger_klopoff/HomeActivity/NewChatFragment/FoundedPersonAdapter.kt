@@ -3,7 +3,6 @@ package com.klopoff.messenger_klopoff.HomeActivity.NewChatFragment
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.klopoff.messenger_klopoff.HomeActivity.ChatsFragment.ChatsFragment
 import com.klopoff.messenger_klopoff.R
 import com.klopoff.messenger_klopoff.databinding.ItemFoundedPersonBinding
 
@@ -24,6 +23,8 @@ class FoundedPersonAdapter(
             } else {
                 itemBinding.ivAvatar.setImageResource(R.drawable.ic_avatar_placeholder)
             }
+
+            itemBinding.root.setOnClickListener { itemClickListener?.onClick(foundedPerson) }
         }
     }
 

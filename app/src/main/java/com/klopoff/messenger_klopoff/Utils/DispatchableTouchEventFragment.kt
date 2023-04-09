@@ -4,5 +4,5 @@ import android.app.Activity
 import android.view.MotionEvent
 
 interface DispatchableTouchEventFragment {
-    fun dispatchTouchEvent(activity: Activity, event: MotionEvent) : Boolean
+    fun dispatchTouchEvent(activity: Activity, event: MotionEvent): Boolean
 }

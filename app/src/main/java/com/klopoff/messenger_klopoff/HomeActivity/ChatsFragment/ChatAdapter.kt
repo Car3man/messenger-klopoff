@@ -1,5 +1,6 @@
 package com.klopoff.messenger_klopoff.HomeActivity.ChatsFragment
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -7,8 +8,7 @@ import com.klopoff.messenger_klopoff.R
 import com.klopoff.messenger_klopoff.databinding.ItemChatBinding
 
 class ChatAdapter(
-    private val parent: ViewGroup,
-    private val chats: List<Chat>
+    private val context: Context, private val chats: List<Chat>
 ) : RecyclerView.Adapter<ChatAdapter.ViewHolder>() {
 
     private var itemClickListener: ChatsFragment.ChatItemClickListener? = null
@@ -29,12 +29,10 @@ class ChatAdapter(
                 if (lastMessage != null) {
                     itemBinding.tvLastMessage.text = lastMessage!!.message
                 } else {
-                    itemBinding.tvLastMessage.text = parent.context.getString(R.string.no_messages)
+                    itemBinding.tvLastMessage.text = context.getString(R.string.no_messages)
                 }
 
-                itemBinding.root.setOnClickListener {
-                    itemClickListener?.onClick(this)
-                }
+                itemBinding.root.setOnClickListener { itemClickListener?.onClick(this) }
             }
         }
     }
