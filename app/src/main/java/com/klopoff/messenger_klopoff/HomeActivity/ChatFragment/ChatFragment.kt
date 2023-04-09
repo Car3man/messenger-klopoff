@@ -7,11 +7,13 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 import com.klopoff.messenger_klopoff.HomeActivity.ChatsFragment.Chat
 import com.klopoff.messenger_klopoff.Utils.BottomNavigationSupport
 import com.klopoff.messenger_klopoff.Utils.DispatchableTouchEventFragment
@@ -19,16 +21,29 @@ import com.klopoff.messenger_klopoff.Utils.MarginItemDecoration
 import com.klopoff.messenger_klopoff.Utils.Utils
 import com.klopoff.messenger_klopoff.databinding.FragmentChatBinding
 import dev.chrisbanes.insetter.applyInsetter
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import java.util.*
 
 private const val CHAT_PARAM = "CHAT"
 
 class ChatFragment : Fragment(), DispatchableTouchEventFragment, BottomNavigationSupport {
 
+    private lateinit var adapter: ChatMessageAdapter
     private lateinit var binding: FragmentChatBinding
+    private lateinit var chat: Chat
+    private var messages: MutableList<ChatMessage> = mutableListOf()
     private var parentBottomNavigation: BottomNavigationView? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        arguments?.let {
+            chat = it.getParcelable(CHAT_PARAM)!!
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,7 +59,8 @@ class ChatFragment : Fragment(), DispatchableTouchEventFragment, BottomNavigatio
                 .setReverseLayout(layoutManager.reverseLayout)
                 .setVerticalMargin(8)
         )
-        binding.recyclerView.adapter = ChatMessageAdapter(getDummyMessages())
+        adapter = ChatMessageAdapter(messages)
+        binding.recyclerView.adapter = adapter
 
         // Apply padding to input field if soft keyboard is active
         binding.textInputMessage.applyInsetter {
@@ -68,10 +84,75 @@ class ChatFragment : Fragment(), DispatchableTouchEventFragment, BottomNavigatio
         }
 
         binding.textInputMessage.setEndIconOnClickListener {
-            // TODO: Send message
+            val message = binding.textInputEditMessage.text.toString()
+
+            Utils.hideSoftKeyboard(requireActivity())
+            binding.textInputMessage.clearFocus()
+            binding.textInputEditMessage.setText("")
+
+            lifecycleScope.launch(Dispatchers.IO) {
+                val auth = FirebaseAuth.getInstance()
+                val database = FirebaseDatabase.getInstance()
+                val currUserId = auth.uid!!
+                val createdAt = Calendar.getInstance().timeInMillis
+                val messageDTO = object {
+                    val message = message
+                    val sender = currUserId
+                }
+
+                database.reference
+                    .child("chats")
+                    .child(currUserId)
+                    .child(chat.userId)
+                    .child(createdAt.toString())
+                    .setValue(messageDTO)
+                    .await()
+
+                database.reference
+                    .child("chats")
+                    .child(chat.userId)
+                    .child(currUserId)
+                    .child(createdAt.toString())
+                    .setValue(messageDTO)
+                    .await()
+            }
         }
 
+        loadMessages()
+
         return binding.root
+    }
+
+    private fun loadMessages() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val auth = FirebaseAuth.getInstance()
+            val database = FirebaseDatabase.getInstance()
+            val currUserId = auth.uid!!
+
+            val loadedMessages = database.reference
+                .child("chats")
+                .child(currUserId)
+                .child(chat.userId)
+                .orderByKey()
+                .get()
+                .await()
+                .children
+                .map {
+                    val createdAt = it.key!!.toLong()
+                    val sender = it.child("sender").value as String
+                    val mine = sender == currUserId
+                    val message = it.child("message").value as String
+                    ChatMessage(mine, message, createdAt)
+                }
+
+            messages.clear()
+            messages.addAll(loadedMessages.asReversed())
+
+            withContext(Dispatchers.Main) {
+                binding.tvNothingFound.isVisible = messages.isEmpty()
+                adapter.notifyDataSetChanged()
+            }
+        }
     }
 
     override fun dispatchTouchEvent(activity: Activity, event: MotionEvent) : Boolean {
@@ -86,29 +167,6 @@ class ChatFragment : Fragment(), DispatchableTouchEventFragment, BottomNavigatio
 
     override fun onBottomNavigationProvided(bottomNavigation: BottomNavigationView) {
         parentBottomNavigation = bottomNavigation
-    }
-
-    private fun getDummyMessages(): List<ChatMessage> {
-        val messages = mutableListOf<ChatMessage>()
-        messages.add(ChatMessage(false, "That's good idea sir. I'd like to improve their skill.", getMessageTime(16,30)))
-        messages.add(ChatMessage(true, "Where are your ? I have something new for you.", getMessageTime(16,37)))
-        messages.add(ChatMessage(false, "I still finishing my project. What happen ?", getMessageTime(16,45)))
-        messages.add(ChatMessage(true, "I bring a new bag for you! I buy this one because 2 days ago i went to Paris.", getMessageTime(17,3)))
-        messages.add(ChatMessage(false, "What ?? Thank you very much. I'll be at home at 7 pm.", getMessageTime(17,25)))
-        messages.add(ChatMessage(true, "That's great. Have a nice day!", getMessageTime(17,47)))
-        messages.add(ChatMessage(false, "That's good idea sir. I'd like to improve their skill.", getMessageTime(16,30)))
-        messages.add(ChatMessage(true, "Where are your ? I have something new for you.", getMessageTime(16,37)))
-        messages.add(ChatMessage(false, "I still finishing my project. What happen ?", getMessageTime(16,45)))
-        messages.add(ChatMessage(true, "I bring a new bag for you! I buy this one because 2 days ago i went to Paris.", getMessageTime(17,3)))
-        messages.add(ChatMessage(false, "What ?? Thank you very much. I'll be at home at 7 pm.", getMessageTime(17,25)))
-        messages.add(ChatMessage(true, "That's great. Have a nice day!", getMessageTime(17,47)))
-        messages.reverse()
-        return messages
-    }
-
-    private fun getMessageTime(hours: Int, minutes: Int): Long {
-        val calendar = GregorianCalendar(2023, 4, 6, hours, minutes, 0)
-        return calendar.timeInMillis
     }
 
     companion object {

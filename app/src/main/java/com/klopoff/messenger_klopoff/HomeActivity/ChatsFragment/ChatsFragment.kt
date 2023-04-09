@@ -8,14 +8,11 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
-import com.klopoff.messenger_klopoff.HomeActivity.NewChatFragment.FoundedPerson
 import com.klopoff.messenger_klopoff.Utils.MarginItemDecoration
 import com.klopoff.messenger_klopoff.databinding.FragmentChatsBinding
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
