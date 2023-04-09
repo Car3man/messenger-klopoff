@@ -27,7 +27,7 @@ class ChatAdapter(
                 }
 
                 if (lastMessage != null) {
-                    itemBinding.tvLastMessage.text = lastMessage.message
+                    itemBinding.tvLastMessage.text = lastMessage!!.message
                 } else {
                     itemBinding.tvLastMessage.text = parent.context.getString(R.string.no_messages)
                 }

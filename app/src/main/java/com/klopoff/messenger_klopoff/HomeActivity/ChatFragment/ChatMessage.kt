@@ -4,9 +4,9 @@ import android.os.Parcel
 import android.os.Parcelable
 
 class ChatMessage(
-    val mine: Boolean,
-    val message: String,
-    val createdAt: Long
+    var mine: Boolean,
+    var message: String,
+    var createdAt: Long
 ): Parcelable {
 
     override fun describeContents(): Int {

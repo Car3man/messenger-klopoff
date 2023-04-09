@@ -74,6 +74,7 @@ class NewChatFragment : Fragment() {
                 .get()
                 .await()
                 .children
+                .filter { (it.child("userName").value as String).contains(userName) }
                 .map {
                     val personUserId = it.child("userId").value as String
                     val personUserName = it.child("userName").value as String

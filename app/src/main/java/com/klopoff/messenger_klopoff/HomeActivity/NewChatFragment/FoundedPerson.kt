@@ -5,9 +5,9 @@ import android.os.Parcel
 import android.os.Parcelable
 
 class FoundedPerson(
-    val userId: String,
-    val userName: String,
-    val userAvatar: Bitmap?
+    var userId: String,
+    var userName: String,
+    var userAvatar: Bitmap?
 ) : Parcelable {
 
     override fun describeContents(): Int {

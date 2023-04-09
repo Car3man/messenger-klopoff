@@ -6,10 +6,10 @@ import android.os.Parcelable
 import com.klopoff.messenger_klopoff.HomeActivity.ChatFragment.ChatMessage
 
 class Chat(
-    val userId: String,
-    val userName: String,
-    val userAvatar: Bitmap?,
-    val lastMessage: ChatMessage?
+    var userId: String,
+    var userName: String,
+    var userAvatar: Bitmap?,
+    var lastMessage: ChatMessage?
 ): Parcelable {
 
     override fun describeContents(): Int {
