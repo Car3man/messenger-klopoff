@@ -19,10 +19,18 @@ import kotlinx.coroutines.withContext
 
 class ChatsFragment : Fragment() {
 
+    private lateinit var auth: FirebaseAuth
+    private lateinit var database: FirebaseDatabase
     private lateinit var adapter: ChatAdapter
     private var chats: MutableList<Chat> = mutableListOf()
     private var chatItemClickListener: ChatItemClickListener? = null
     private var newChatButtonClickListener: View.OnClickListener? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        auth = FirebaseAuth.getInstance()
+        database = FirebaseDatabase.getInstance()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -59,9 +67,6 @@ class ChatsFragment : Fragment() {
     @SuppressLint("NotifyDataSetChanged")
     private fun loadChats() {
         lifecycleScope.launch(Dispatchers.IO) {
-            val auth = FirebaseAuth.getInstance()
-            val database = FirebaseDatabase.getInstance()
-
             val loadedChats = database.reference
                 .child("chats")
                 .child(auth.uid!!)

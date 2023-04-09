@@ -13,6 +13,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.ChildEventListener
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.klopoff.messenger_klopoff.HomeActivity.ChatsFragment.Chat
 import com.klopoff.messenger_klopoff.Utils.BottomNavigationSupport
@@ -32,17 +35,22 @@ private const val CHAT_PARAM = "CHAT"
 
 class ChatFragment : Fragment(), DispatchableTouchEventFragment, BottomNavigationSupport {
 
+    private lateinit var auth: FirebaseAuth
+    private lateinit var database: FirebaseDatabase
     private lateinit var adapter: ChatMessageAdapter
     private lateinit var binding: FragmentChatBinding
     private lateinit var chat: Chat
     private var messages: MutableList<ChatMessage> = mutableListOf()
     private var parentBottomNavigation: BottomNavigationView? = null
+    private var chatUpdateListener: ChildEventListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
             chat = it.getParcelable(CHAT_PARAM)!!
         }
+        auth = FirebaseAuth.getInstance()
+        database = FirebaseDatabase.getInstance()
     }
 
     override fun onCreateView(
@@ -86,23 +94,18 @@ class ChatFragment : Fragment(), DispatchableTouchEventFragment, BottomNavigatio
         binding.textInputMessage.setEndIconOnClickListener {
             val message = binding.textInputEditMessage.text.toString()
 
-            Utils.hideSoftKeyboard(requireActivity())
-            binding.textInputMessage.clearFocus()
             binding.textInputEditMessage.setText("")
 
             lifecycleScope.launch(Dispatchers.IO) {
-                val auth = FirebaseAuth.getInstance()
-                val database = FirebaseDatabase.getInstance()
-                val currUserId = auth.uid!!
                 val createdAt = Calendar.getInstance().timeInMillis
                 val messageDTO = object {
                     val message = message
-                    val sender = currUserId
+                    val sender = auth.uid!!
                 }
 
                 database.reference
                     .child("chats")
-                    .child(currUserId)
+                    .child(auth.uid!!)
                     .child(chat.userId)
                     .child(createdAt.toString())
                     .setValue(messageDTO)
@@ -111,27 +114,30 @@ class ChatFragment : Fragment(), DispatchableTouchEventFragment, BottomNavigatio
                 database.reference
                     .child("chats")
                     .child(chat.userId)
-                    .child(currUserId)
+                    .child(auth.uid!!)
                     .child(createdAt.toString())
                     .setValue(messageDTO)
                     .await()
             }
         }
 
+        subscribeToChatUpdates()
         loadMessages()
 
         return binding.root
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        unsubscribeToChatUpdates()
+    }
+
     private fun loadMessages() {
         lifecycleScope.launch(Dispatchers.IO) {
-            val auth = FirebaseAuth.getInstance()
-            val database = FirebaseDatabase.getInstance()
-            val currUserId = auth.uid!!
-
             val loadedMessages = database.reference
                 .child("chats")
-                .child(currUserId)
+                .child(auth.uid!!)
                 .child(chat.userId)
                 .orderByKey()
                 .get()
@@ -140,7 +146,7 @@ class ChatFragment : Fragment(), DispatchableTouchEventFragment, BottomNavigatio
                 .map {
                     val createdAt = it.key!!.toLong()
                     val sender = it.child("sender").value as String
-                    val mine = sender == currUserId
+                    val mine = sender == auth.uid!!
                     val message = it.child("message").value as String
                     ChatMessage(mine, message, createdAt)
                 }
@@ -153,6 +159,49 @@ class ChatFragment : Fragment(), DispatchableTouchEventFragment, BottomNavigatio
                 adapter.notifyDataSetChanged()
             }
         }
+    }
+
+    private fun subscribeToChatUpdates() {
+        chatUpdateListener = database.reference
+            .child("chats")
+            .child(auth.uid!!)
+            .child(chat.userId)
+            .addChildEventListener(object : ChildEventListener {
+                override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                    val createdAt = snapshot.key!!.toLong()
+                    val sender = snapshot.child("sender").value as String
+                    val mine = sender == auth.uid!!
+                    val message = snapshot.child("message").value as String
+
+                    messages.add(0, ChatMessage(mine, message, createdAt))
+                    adapter.notifyItemInserted(0)
+                    binding.recyclerView.smoothScrollToPosition(0)
+                }
+
+                override fun onChildRemoved(snapshot: DataSnapshot) {
+                    val createdAt = snapshot.key!!.toLong()
+
+                    val removeIndex = messages.indexOfFirst { it.createdAt == createdAt }
+                    if (removeIndex != -1) {
+                        messages.removeAt(removeIndex)
+                        adapter.notifyItemRemoved(removeIndex)
+                    }
+                }
+
+                override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) { }
+
+                override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) { }
+
+                override fun onCancelled(error: DatabaseError) { }
+            })
+    }
+
+    private fun unsubscribeToChatUpdates() {
+        database.reference
+            .child("chats")
+            .child(auth.uid!!)
+            .child(chat.userId)
+            .removeEventListener(chatUpdateListener!!)
     }
 
     override fun dispatchTouchEvent(activity: Activity, event: MotionEvent) : Boolean {
