@@ -9,7 +9,6 @@ import com.klopoff.messenger_klopoff.databinding.ItemChatMessageOtherBinding
 import java.text.SimpleDateFormat
 import java.util.*
 
-
 class ChatMessageAdapter(
     private val messages: List<ChatMessage>
 ) : RecyclerView.Adapter<ChatMessageAdapter.ViewHolder>() {

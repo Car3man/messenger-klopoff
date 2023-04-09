@@ -36,8 +36,6 @@ class ChatFragment : Fragment(), DispatchableTouchEventFragment, BottomNavigatio
     ): View {
         binding = FragmentChatBinding.inflate(inflater, container, false)
 
-        val messages = getDummyMessages()
-        val adapter = ChatMessageAdapter(messages)
         val layoutManager = StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL)
         layoutManager.reverseLayout = true
         binding.recyclerView.layoutManager = layoutManager
@@ -46,17 +44,7 @@ class ChatFragment : Fragment(), DispatchableTouchEventFragment, BottomNavigatio
                 .setReverseLayout(layoutManager.reverseLayout)
                 .setVerticalMargin(8)
         )
-        binding.recyclerView.adapter = adapter
-        binding.recyclerView.addOnScrollListener(object: RecyclerView.OnScrollListener() {
-            val lastVisibleItemPositions = IntArray(1)
-
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                if (dy >= 0) return
-                layoutManager.findLastVisibleItemPositions(lastVisibleItemPositions)
-                if (lastVisibleItemPositions[0] == RecyclerView.NO_POSITION) return
-                // TODO: load more items
-            }
-        })
+        binding.recyclerView.adapter = ChatMessageAdapter(getDummyMessages())
 
         // Apply padding to input field if soft keyboard is active
         binding.textInputMessage.applyInsetter {

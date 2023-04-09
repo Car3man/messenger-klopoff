@@ -9,6 +9,8 @@ import androidx.fragment.app.commit
 import com.klopoff.messenger_klopoff.HomeActivity.ChatFragment.ChatFragment
 import com.klopoff.messenger_klopoff.HomeActivity.ChatsFragment.Chat
 import com.klopoff.messenger_klopoff.HomeActivity.ChatsFragment.ChatsFragment
+import com.klopoff.messenger_klopoff.HomeActivity.NewChatFragment.FoundedPerson
+import com.klopoff.messenger_klopoff.HomeActivity.NewChatFragment.NewChatFragment
 import com.klopoff.messenger_klopoff.R
 import com.klopoff.messenger_klopoff.Utils.BottomNavigationSupport
 import com.klopoff.messenger_klopoff.Utils.DispatchableTouchEventFragment
@@ -26,34 +28,29 @@ class HomeActivity : AppCompatActivity() {
 
         binding = ActivityHomeBinding.inflate(layoutInflater)
         binding.root.applyInsetter {
-            type (statusBars = true) {
+            type(statusBars = true) {
                 margin(vertical = true)
             }
+        }
+        binding.bottomNavigation.applyInsetter {
+            type(navigationBars = true) {
+                padding()
+            }
+            type(ime = true) {}
         }
         setContentView(binding.root)
 
         supportFragmentManager.commit {
             replace(R.id.fragmentContainerView, ProfileFragment.newInstance())
         }
-
-        binding.bottomNavigation.setOnItemSelectedListener {
-            onNavigationItemClick(it)
-        }
+        binding.bottomNavigation.setOnItemSelectedListener { onNavigationItemClick(it) }
         binding.bottomNavigation.selectedItemId = R.id.itemChats
     }
 
     private fun onNavigationItemClick(it: MenuItem): Boolean {
         val nextFragment = when (it.itemId) {
             R.id.itemProfile -> ProfileFragment.newInstance()
-            R.id.itemChats -> {
-                val chatsFragment = ChatsFragment.newInstance()
-                chatsFragment.setItemClickListener(object: ChatsFragment.ChatItemListener {
-                    override fun onClicked(chat: Chat) {
-                        onChatItemClick(chat)
-                    }
-                })
-                chatsFragment
-            }
+            R.id.itemChats -> createChatsFragment()
             R.id.itemSettings -> SettingsFragment.newInstance()
             else -> throw Exception("Out of bottom navigation items")
         }
@@ -74,6 +71,35 @@ class HomeActivity : AppCompatActivity() {
             addToBackStack(null)
             replace(R.id.fragmentContainerView, chatFragment)
         }
+    }
+
+    private fun createChatsFragment(): ChatsFragment {
+        val chatsFragment = ChatsFragment.newInstance()
+
+        chatsFragment.setChatItemClickListener(object : ChatsFragment.ChatItemClickListener {
+            override fun onClick(chat: Chat) {
+                onChatItemClick(chat)
+            }
+        })
+
+        chatsFragment.setNewChatButtonClickListener {
+            val newChatFragment = NewChatFragment.newInstance()
+            newChatFragment.setFoundedPersonClickListener(object : NewChatFragment.FoundedPersonItemClickListener {
+                override fun onClick(foundedPerson: FoundedPerson) {
+                    createNewChatWithPerson(foundedPerson)
+                }
+            })
+
+            supportFragmentManager.commit {
+                addToBackStack(null)
+                replace(R.id.fragmentContainerView, newChatFragment)
+            }
+        }
+        return chatsFragment
+    }
+
+    private fun createNewChatWithPerson(foundedPerson: FoundedPerson) {
+
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {

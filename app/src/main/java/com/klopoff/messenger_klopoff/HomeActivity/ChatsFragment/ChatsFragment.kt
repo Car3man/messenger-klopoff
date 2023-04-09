@@ -6,12 +6,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.klopoff.messenger_klopoff.Utils.MarginItemDecoration
 import com.klopoff.messenger_klopoff.databinding.FragmentChatsBinding
 
 class ChatsFragment : Fragment() {
 
-    private var itemClickListener: ChatItemListener? = null
+    private lateinit var adapter: ChatAdapter
+    private var chats: MutableList<Chat> = mutableListOf()
+    private var chatItemClickListener: ChatItemClickListener? = null
+    private var newChatButtonClickListener: View.OnClickListener? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -19,9 +23,6 @@ class ChatsFragment : Fragment() {
     ): View {
         val binding = FragmentChatsBinding.inflate(inflater, container, false)
 
-        val chats = getDummyChats()
-        val adapter = ChatAdapter(binding.root, chats)
-        adapter.setItemClickListener(itemClickListener)
         val layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         binding.recyclerView.layoutManager = layoutManager
         binding.recyclerView.addItemDecoration(
@@ -29,21 +30,21 @@ class ChatsFragment : Fragment() {
                 .setReverseLayout(layoutManager.reverseLayout)
                 .setVerticalMargin(16)
         )
+        adapter = ChatAdapter(binding.root, chats)
+        adapter.setItemClickListener(chatItemClickListener)
         binding.recyclerView.adapter = adapter
+
+        newChatButtonClickListener?.let { binding.fabChats.setOnClickListener(it) }
 
         return binding.root
     }
 
-    private fun getDummyChats(): List<Chat> {
-        val messages = mutableListOf<Chat>()
-        messages.add(Chat("userId", "TestUser1", null, null))
-        messages.add(Chat("userId", "TestUser2", null, null))
-        messages.add(Chat("userId", "TestUser3", null, null))
-        return messages
+    fun setChatItemClickListener(listener: ChatItemClickListener) {
+        chatItemClickListener = listener
     }
 
-    fun setItemClickListener(listener: ChatItemListener) {
-        itemClickListener = listener
+    fun setNewChatButtonClickListener(listener: View.OnClickListener) {
+        newChatButtonClickListener = listener
     }
 
     companion object {
@@ -51,7 +52,7 @@ class ChatsFragment : Fragment() {
         fun newInstance() = ChatsFragment()
     }
 
-    interface ChatItemListener {
-        fun onClicked(chat: Chat)
+    interface ChatItemClickListener {
+        fun onClick(chat: Chat)
     }
 }

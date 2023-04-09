@@ -8,6 +8,7 @@ class ChatMessage(
     val message: String,
     val createdAt: Long
 ): Parcelable {
+
     override fun describeContents(): Int {
         return 0
     }

@@ -23,7 +23,10 @@
     <string name="chats">Chats</string>
     <string name="profile">Profile</string>
     <string name="user_avatar">User avatar</string>
-    <string name="no_messages">Нет сообщений</string>
-    <string name="message">Сообщение</string>
+    <string name="no_messages">No messages</string>
+    <string name="message">Message</string>
     <string name="send_message">Send message</string>
+    <string name="chats_fab">fab_contact</string>
+    <string name="search">Search</string>
+    <string name="nothing_found">Nothing found</string>
 </resources>

@@ -11,34 +11,32 @@ class ChatAdapter(
     private val chats: List<Chat>
 ) : RecyclerView.Adapter<ChatAdapter.ViewHolder>() {
 
-    private var itemClickListener: ChatsFragment.ChatItemListener? = null
+    private var itemClickListener: ChatsFragment.ChatItemClickListener? = null
 
     inner class ViewHolder(
         private var itemBinding: ItemChatBinding
     ) : RecyclerView.ViewHolder(itemBinding.root) {
         fun bind(chat: Chat) {
-            with (chat) {
-                itemBinding.tvUsername.text = chat.userName
-                if (chat.userAvatar != null) {
-                    itemBinding.ivAvatar.setImageBitmap(chat.userAvatar)
+            with(chat) {
+                itemBinding.tvUsername.text = userName
+
+                if (userAvatar != null) {
+                    itemBinding.ivAvatar.setImageBitmap(userAvatar)
                 } else {
                     itemBinding.ivAvatar.setImageResource(R.drawable.ic_avatar_placeholder)
                 }
-                if (chat.lastMessage != null) {
-                    itemBinding.tvLastMessage.text = chat.lastMessage.message
+
+                if (lastMessage != null) {
+                    itemBinding.tvLastMessage.text = lastMessage.message
                 } else {
                     itemBinding.tvLastMessage.text = parent.context.getString(R.string.no_messages)
                 }
-                println(itemBinding.root.isClickable)
+
                 itemBinding.root.setOnClickListener {
-                    itemClickListener?.onClicked(chat)
+                    itemClickListener?.onClick(this)
                 }
             }
         }
-    }
-
-    fun setItemClickListener(listener: ChatsFragment.ChatItemListener?) {
-        itemClickListener = listener
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -53,5 +51,9 @@ class ChatAdapter(
 
     override fun getItemCount(): Int {
         return chats.size
+    }
+
+    fun setItemClickListener(listener: ChatsFragment.ChatItemClickListener?) {
+        itemClickListener = listener
     }
 }
