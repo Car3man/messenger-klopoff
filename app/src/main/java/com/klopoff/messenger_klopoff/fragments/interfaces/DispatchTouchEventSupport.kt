@@ -1,8 +1,8 @@
-package com.klopoff.messenger_klopoff.Utils
+package com.klopoff.messenger_klopoff.fragments.interfaces
 
 import android.app.Activity
 import android.view.MotionEvent
 
-interface DispatchableTouchEventFragment {
+interface DispatchTouchEventSupport {
     fun dispatchTouchEvent(activity: Activity, event: MotionEvent): Boolean
 }

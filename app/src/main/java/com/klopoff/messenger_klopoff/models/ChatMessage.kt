@@ -1,10 +1,12 @@
-package com.klopoff.messenger_klopoff.HomeActivity.ChatFragment
+package com.klopoff.messenger_klopoff.models
 
 import android.os.Parcel
 import android.os.Parcelable
 
 class ChatMessage(
-    var mine: Boolean, var message: String, var createdAt: Long
+    var mine: Boolean,
+    var message: String,
+    var createdAt: Long
 ) : Parcelable {
 
     override fun describeContents(): Int {

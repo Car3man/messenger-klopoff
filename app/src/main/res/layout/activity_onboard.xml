@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".OnBoardActivity.OnBoardActivity">
+    tools:context=".activities.OnBoardActivity">
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/glTop"
@@ -37,7 +37,7 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/glTop"
-        app:tabBackground="@drawable/onboard_page_tab_selector"
+        app:tabBackground="@drawable/tab_selector"
         app:tabGravity="center"
         app:tabIndicatorHeight="0dp"
         app:tabPaddingEnd="6dp"

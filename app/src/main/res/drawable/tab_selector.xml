@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@drawable/onboard_page_selected_dot"
+    <item android:drawable="@drawable/selected_dot"
         android:state_selected="true"/>
-    <item android:drawable="@drawable/onboard_page_default_dot"/>
+    <item android:drawable="@drawable/default_dot"/>
 </selector>

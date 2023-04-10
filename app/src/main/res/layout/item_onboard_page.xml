@@ -52,7 +52,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed"
         tools:ignore="ContentDescription"
-        tools:srcCompat="@drawable/onboard_page_thumbnail1" />
+        tools:srcCompat="@drawable/thumbnail_onboard_page1" />
 
     <TextView
         android:id="@+id/tvShortTitle"

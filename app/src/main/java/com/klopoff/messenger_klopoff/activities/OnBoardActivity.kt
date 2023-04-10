@@ -1,4 +1,4 @@
-package com.klopoff.messenger_klopoff.OnBoardActivity
+package com.klopoff.messenger_klopoff.activities
 
 import android.content.Intent
 import android.os.Bundle
@@ -8,10 +8,9 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.klopoff.messenger_klopoff.HomeActivity.HomeActivity
+import com.klopoff.messenger_klopoff.models.OnBoardPage
+import com.klopoff.messenger_klopoff.adapters.OnBoardPageAdapter
 import com.klopoff.messenger_klopoff.R
-import com.klopoff.messenger_klopoff.SignInActivity
-import com.klopoff.messenger_klopoff.SignUpActivity
 import com.klopoff.messenger_klopoff.databinding.ActivityOnboardBinding
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
@@ -20,6 +19,14 @@ class OnBoardActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityOnboardBinding
     private lateinit var auth: FirebaseAuth
+    private val pages: List<OnBoardPage> = listOf(
+        OnBoardPage(R.drawable.thumbnail_onboard_page1, "First", "First onBoard page short description"),
+        OnBoardPage(R.drawable.thumbnail_onboard_page2, "Second", "Second onBoard page short description"),
+        OnBoardPage(R.drawable.thumbnail_onboard_page3, "Third", "Third onBoard page short description"),
+        OnBoardPage(R.drawable.thumbnail_onboard_page4, "Four", "Four onBoard page short description"),
+        OnBoardPage(R.drawable.thumbnail_onboard_page5, "Fifth", "Fifth onBoard page short description")
+    )
+    private val adapter: OnBoardPageAdapter = OnBoardPageAdapter(pages)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,37 +77,9 @@ class OnBoardActivity : AppCompatActivity() {
         binding = ActivityOnboardBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val pages = mutableListOf<OnBoardPage>()
-        pages.add(
-            OnBoardPage(
-                R.drawable.onboard_page_thumbnail1, "First", "First onBoard page short description"
-            )
-        )
-        pages.add(
-            OnBoardPage(
-                R.drawable.onboard_page_thumbnail2,
-                "Second",
-                "Second onBoard page short description"
-            )
-        )
-        pages.add(
-            OnBoardPage(
-                R.drawable.onboard_page_thumbnail3, "Third", "Third onBoard page short description"
-            )
-        )
-        pages.add(
-            OnBoardPage(
-                R.drawable.onboard_page_thumbnail4, "Four", "Four onBoard page short description"
-            )
-        )
-        pages.add(
-            OnBoardPage(
-                R.drawable.onboard_page_thumbnail5, "Fifth", "Fifth onBoard page short description"
-            )
-        )
-
-        binding.vpOnBoardPages.adapter = OnBoardPageAdapter(pages)
+        binding.vpOnBoardPages.adapter = adapter
         TabLayoutMediator(binding.tlOnBoardPages, binding.vpOnBoardPages) { _, _ -> }.attach()
+
         binding.btnStartMessaging.setOnClickListener {
             val sharedPreferencesEditor = sharedPreferences.edit()
             sharedPreferencesEditor.putBoolean("FTUE", true)

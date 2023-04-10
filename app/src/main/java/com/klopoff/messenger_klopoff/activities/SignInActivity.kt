@@ -1,4 +1,4 @@
-package com.klopoff.messenger_klopoff
+package com.klopoff.messenger_klopoff.activities
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -8,10 +8,9 @@ import androidx.lifecycle.lifecycleScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.klopoff.messenger_klopoff.HomeActivity.HomeActivity
-import com.klopoff.messenger_klopoff.Utils.isEmailValid
-import com.klopoff.messenger_klopoff.Utils.isPasswordValid
+import com.klopoff.messenger_klopoff.R
 import com.klopoff.messenger_klopoff.databinding.ActivitySigninBinding
+import com.klopoff.messenger_klopoff.utils.ValidationUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -41,12 +40,12 @@ class SignInActivity : AppCompatActivity() {
         val email = binding.tfEmail.editText!!.text.toString()
         val password = binding.tfPassword.editText!!.text.toString()
 
-        if (!email.isEmailValid()) {
+        if (!ValidationUtils.validateEmail(email)) {
             binding.tfEmail.error = getString(R.string.invalid_email_error)
             return
         }
 
-        if (!password.isPasswordValid()) {
+        if (!ValidationUtils.validatePassword(password)) {
             binding.tfPassword.error = getString(R.string.invalid_password_error)
             return
         }

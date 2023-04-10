@@ -1,12 +1,14 @@
-package com.klopoff.messenger_klopoff.HomeActivity.ChatsFragment
+package com.klopoff.messenger_klopoff.models
 
 import android.graphics.Bitmap
 import android.os.Parcel
 import android.os.Parcelable
-import com.klopoff.messenger_klopoff.HomeActivity.ChatFragment.ChatMessage
 
 class Chat(
-    var userId: String, var userName: String, var userAvatar: Bitmap?, var lastMessage: ChatMessage?
+    var userId: String,
+    var userName: String,
+    var userAvatar: Bitmap?,
+    var lastMessage: ChatMessage?
 ) : Parcelable {
 
     override fun describeContents(): Int {
@@ -27,17 +29,9 @@ class Chat(
             val userId = `in`.readString()!!
             val userName = `in`.readString()!!
             val userAvatarExist = `in`.readInt() == 1
-            val userAvatar = if (userAvatarExist) {
-                Bitmap.CREATOR.createFromParcel(`in`)
-            } else {
-                null
-            }
+            val userAvatar = if (userAvatarExist) { Bitmap.CREATOR.createFromParcel(`in`) } else { null }
             val lastMessageExist = `in`.readInt() == 1
-            val lastMessage = if (lastMessageExist) {
-                ChatMessage.createFromParcel(`in`)
-            } else {
-                null
-            }
+            val lastMessage = if (lastMessageExist) { ChatMessage.createFromParcel(`in`) } else { null }
             return Chat(userId, userName, userAvatar, lastMessage)
         }
 

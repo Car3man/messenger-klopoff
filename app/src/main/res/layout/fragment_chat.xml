@@ -7,7 +7,7 @@
     android:background="#F3F3F3"
     android:clickable="true"
     android:focusableInTouchMode="true"
-    tools:context=".HomeActivity.ChatFragment.ChatFragment">
+    tools:context=".fragments.ChatFragment">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"

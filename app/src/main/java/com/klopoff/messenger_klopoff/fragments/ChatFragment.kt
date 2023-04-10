@@ -1,4 +1,4 @@
-package com.klopoff.messenger_klopoff.HomeActivity.ChatFragment
+package com.klopoff.messenger_klopoff.fragments
 
 import android.app.Activity
 import android.os.Bundle
@@ -20,12 +20,15 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import com.klopoff.messenger_klopoff.HomeActivity.ChatsFragment.Chat
-import com.klopoff.messenger_klopoff.Utils.BottomNavigationSupport
-import com.klopoff.messenger_klopoff.Utils.DispatchableTouchEventFragment
-import com.klopoff.messenger_klopoff.Utils.MarginItemDecoration
-import com.klopoff.messenger_klopoff.Utils.Utils
+import com.klopoff.messenger_klopoff.models.ChatMessage
+import com.klopoff.messenger_klopoff.adapters.ChatMessageAdapter
+import com.klopoff.messenger_klopoff.models.Chat
+import com.klopoff.messenger_klopoff.fragments.interfaces.BottomNavigationSupport
+import com.klopoff.messenger_klopoff.fragments.interfaces.DispatchTouchEventSupport
+import com.klopoff.messenger_klopoff.decorations.ItemMarginsDecoration
 import com.klopoff.messenger_klopoff.databinding.FragmentChatBinding
+import com.klopoff.messenger_klopoff.utils.InputUtils
+import com.klopoff.messenger_klopoff.utils.UiUtils
 import dev.chrisbanes.insetter.applyInsetter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -36,7 +39,7 @@ import java.util.*
 
 private const val CHAT_PARAM = "CHAT"
 
-class ChatFragment : Fragment(), DispatchableTouchEventFragment, BottomNavigationSupport {
+class ChatFragment : Fragment(), DispatchTouchEventSupport, BottomNavigationSupport {
 
     private val auth: FirebaseAuth = Firebase.auth
     private val database: FirebaseDatabase = Firebase.database
@@ -52,9 +55,7 @@ class ChatFragment : Fragment(), DispatchableTouchEventFragment, BottomNavigatio
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        arguments?.let {
-            chat = it.getParcelable(CHAT_PARAM)!!
-        }
+        arguments?.let { chat = it.getParcelable(CHAT_PARAM)!! }
     }
 
     override fun onCreateView(
@@ -66,7 +67,7 @@ class ChatFragment : Fragment(), DispatchableTouchEventFragment, BottomNavigatio
         layoutManager.reverseLayout = true
         binding.recyclerView.layoutManager = layoutManager
         binding.recyclerView.addItemDecoration(
-            MarginItemDecoration(requireContext())
+            ItemMarginsDecoration(requireContext())
                 .setReverseLayout(layoutManager.reverseLayout)
                 .setVerticalMargin(8)
         )
@@ -177,6 +178,7 @@ class ChatFragment : Fragment(), DispatchableTouchEventFragment, BottomNavigatio
                     val message = snapshot.child("message").value as String
 
                     messages.add(0, ChatMessage(mine, message, createdAt))
+                    binding.tvNothingFound.isVisible = messages.isEmpty()
                     adapter.notifyItemInserted(0)
                     binding.recyclerView.smoothScrollToPosition(0)
                 }
@@ -187,6 +189,7 @@ class ChatFragment : Fragment(), DispatchableTouchEventFragment, BottomNavigatio
                     val removeIndex = messages.indexOfFirst { it.createdAt == createdAt }
                     if (removeIndex != -1) {
                         messages.removeAt(removeIndex)
+                        binding.tvNothingFound.isVisible = messages.isEmpty()
                         adapter.notifyItemRemoved(removeIndex)
                     }
                 }
@@ -211,9 +214,9 @@ class ChatFragment : Fragment(), DispatchableTouchEventFragment, BottomNavigatio
         if (activity.currentFocus != null) {
             val x = event.rawX.toInt()
             val y = event.rawY.toInt()
-            if (!Utils.isPointInsideView(x, y, binding.textInputEditMessage)) {
+            if (!UiUtils.isPointInsideView(binding.textInputEditMessage, x, y)) {
                 binding.textInputEditMessage.clearFocus()
-                Utils.hideSoftKeyboard(activity)
+                InputUtils.hideSoftKeyboard(activity)
             }
         }
         return false
@@ -226,9 +229,7 @@ class ChatFragment : Fragment(), DispatchableTouchEventFragment, BottomNavigatio
     companion object {
         @JvmStatic
         fun newInstance(chat: Chat) = ChatFragment().apply {
-            arguments = Bundle().apply {
-                putParcelable(CHAT_PARAM, chat)
-            }
+            arguments = Bundle().apply { putParcelable(CHAT_PARAM, chat) }
         }
     }
 }

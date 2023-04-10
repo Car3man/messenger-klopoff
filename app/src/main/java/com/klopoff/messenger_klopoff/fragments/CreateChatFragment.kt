@@ -1,6 +1,5 @@
-package com.klopoff.messenger_klopoff.HomeActivity.NewChatFragment
+package com.klopoff.messenger_klopoff.fragments
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,16 +10,18 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.database.FirebaseDatabase
-import com.klopoff.messenger_klopoff.Utils.MarginItemDecoration
-import com.klopoff.messenger_klopoff.Utils.Utils
+import com.klopoff.messenger_klopoff.models.Person
+import com.klopoff.messenger_klopoff.adapters.PersonAdapter
+import com.klopoff.messenger_klopoff.decorations.ItemMarginsDecoration
 import com.klopoff.messenger_klopoff.databinding.FragmentNewChatBinding
+import com.klopoff.messenger_klopoff.utils.InputUtils
 import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
 
-class NewChatFragment : Fragment() {
+class CreateChatFragment : Fragment() {
 
-    private val foundedUsers: MutableList<FoundedPerson> = mutableListOf()
-    private val adapter: FoundedPersonAdapter = FoundedPersonAdapter(foundedUsers)
+    private val persons: MutableList<Person> = mutableListOf()
+    private val adapter: PersonAdapter = PersonAdapter(persons)
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -28,16 +29,16 @@ class NewChatFragment : Fragment() {
         val binding = FragmentNewChatBinding.inflate(inflater, container, false)
 
         binding.searchInputText.setOnEditorActionListener { _, _, _ ->
-            Utils.hideSoftKeyboard(requireActivity())
+            InputUtils.hideSoftKeyboard(requireActivity())
             binding.searchInputText.clearFocus()
-            tryFindPersons(binding.searchInputText.editableText.toString())
+            findPersons(binding.searchInputText.editableText.toString())
             true
         }
 
         val layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         binding.recyclerView.layoutManager = layoutManager
         binding.recyclerView.addItemDecoration(
-            MarginItemDecoration(requireContext())
+            ItemMarginsDecoration(requireContext())
                 .setReverseLayout(layoutManager.reverseLayout)
                 .setVerticalMargin(16)
         )
@@ -57,11 +58,11 @@ class NewChatFragment : Fragment() {
         return binding.root
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    private fun tryFindPersons(userName: String) {
-        foundedUsers.clear()
-
-        if (userName.isBlank()) return
+    private fun findPersons(userName: String) {
+        if (userName.isBlank()) {
+            persons.clear()
+            return
+        }
 
         lifecycleScope.launch(Dispatchers.IO) {
             val database = FirebaseDatabase.getInstance()
@@ -77,28 +78,27 @@ class NewChatFragment : Fragment() {
                     val personUserId = it.child("userId").value as String
                     val personUserName = it.child("userName").value as String
                     // TODO: implement loading user avatar
-                    FoundedPerson(personUserId, personUserName, null)
+                    Person(personUserId, personUserName, null)
                 }
 
-            foundedUsers.clear()
-            foundedUsers.addAll(persons)
-
             withContext(Dispatchers.Main) {
+                this@CreateChatFragment.persons.clear()
+                this@CreateChatFragment.persons.addAll(persons)
                 adapter.notifyDataSetChanged()
             }
         }
     }
 
-    fun setFoundedPersonClickListener(listener: FoundedPersonItemClickListener?) {
+    fun setPersonClickListener(listener: PersonItemClickListener?) {
         adapter.setItemClickListener(listener)
     }
 
     companion object {
         @JvmStatic
-        fun newInstance() = NewChatFragment()
+        fun newInstance() = CreateChatFragment()
     }
 
-    interface FoundedPersonItemClickListener {
-        fun onClick(foundedPerson: FoundedPerson)
+    interface PersonItemClickListener {
+        fun onClick(foundedPerson: Person)
     }
 }

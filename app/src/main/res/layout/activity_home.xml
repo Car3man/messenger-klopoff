@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".HomeActivity.HomeActivity">
+    tools:context=".activities.HomeActivity">
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragmentContainerView"
@@ -14,7 +14,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/bottomNavigation"
-        android:name="com.klopoff.messenger_klopoff.HomeActivity.ProfileFragment"
+        android:name="com.klopoff.messenger_klopoff.fragments.ProfileFragment"
         tools:layout="@layout/fragment_profile" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView

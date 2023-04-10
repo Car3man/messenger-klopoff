@@ -1,4 +1,4 @@
-package com.klopoff.messenger_klopoff.HomeActivity
+package com.klopoff.messenger_klopoff.activities
 
 import android.os.Bundle
 import android.view.MenuItem
@@ -6,14 +6,16 @@ import android.view.MotionEvent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.fragment.app.commit
-import com.klopoff.messenger_klopoff.HomeActivity.ChatFragment.ChatFragment
-import com.klopoff.messenger_klopoff.HomeActivity.ChatsFragment.Chat
-import com.klopoff.messenger_klopoff.HomeActivity.ChatsFragment.ChatsFragment
-import com.klopoff.messenger_klopoff.HomeActivity.NewChatFragment.FoundedPerson
-import com.klopoff.messenger_klopoff.HomeActivity.NewChatFragment.NewChatFragment
+import com.klopoff.messenger_klopoff.fragments.ChatFragment
+import com.klopoff.messenger_klopoff.models.Chat
+import com.klopoff.messenger_klopoff.fragments.ChatsFragment
+import com.klopoff.messenger_klopoff.models.Person
+import com.klopoff.messenger_klopoff.fragments.ProfileFragment
+import com.klopoff.messenger_klopoff.fragments.SettingsFragment
+import com.klopoff.messenger_klopoff.fragments.CreateChatFragment
 import com.klopoff.messenger_klopoff.R
-import com.klopoff.messenger_klopoff.Utils.BottomNavigationSupport
-import com.klopoff.messenger_klopoff.Utils.DispatchableTouchEventFragment
+import com.klopoff.messenger_klopoff.fragments.interfaces.BottomNavigationSupport
+import com.klopoff.messenger_klopoff.fragments.interfaces.DispatchTouchEventSupport
 import com.klopoff.messenger_klopoff.databinding.ActivityHomeBinding
 import dev.chrisbanes.insetter.applyInsetter
 
@@ -83,24 +85,25 @@ class HomeActivity : AppCompatActivity() {
         })
 
         chatsFragment.setNewChatButtonClickListener {
-            val newChatFragment = NewChatFragment.newInstance()
-            newChatFragment.setFoundedPersonClickListener(object : NewChatFragment.FoundedPersonItemClickListener {
-                override fun onClick(foundedPerson: FoundedPerson) {
+            val createChatFragment = CreateChatFragment.newInstance()
+            createChatFragment.setPersonClickListener(object : CreateChatFragment.PersonItemClickListener {
+                override fun onClick(foundedPerson: Person) {
                     createNewChatWithPerson(foundedPerson)
                 }
             })
 
             supportFragmentManager.commit {
                 addToBackStack(null)
-                replace(R.id.fragmentContainerView, newChatFragment)
+                replace(R.id.fragmentContainerView, createChatFragment)
             }
         }
         return chatsFragment
     }
 
-    private fun createNewChatWithPerson(foundedPerson: FoundedPerson) {
+    private fun createNewChatWithPerson(foundedPerson: Person) {
         supportFragmentManager.popBackStack().also {
-            onChatItemClick(Chat(
+            onChatItemClick(
+                Chat(
                 foundedPerson.userId,
                 foundedPerson.userName,
                 foundedPerson.userAvatar,
@@ -111,8 +114,8 @@ class HomeActivity : AppCompatActivity() {
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
         val fragments = supportFragmentManager.fragments
-        if (fragments.size > 0 && fragments[fragments.size - 1] is DispatchableTouchEventFragment) {
-            val fragment = fragments[fragments.size - 1] as DispatchableTouchEventFragment
+        if (fragments.size > 0 && fragments[fragments.size - 1] is DispatchTouchEventSupport) {
+            val fragment = fragments[fragments.size - 1] as DispatchTouchEventSupport
             if (fragment.dispatchTouchEvent(this, ev)) return true
         }
         return super.dispatchTouchEvent(ev)

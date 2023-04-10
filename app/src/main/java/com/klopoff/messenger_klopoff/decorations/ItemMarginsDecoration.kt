@@ -1,11 +1,12 @@
-package com.klopoff.messenger_klopoff.Utils
+package com.klopoff.messenger_klopoff.decorations
 
 import android.content.Context
 import android.graphics.Rect
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
+import com.klopoff.messenger_klopoff.utils.UiUtils
 
-class MarginItemDecoration private constructor(
+class ItemMarginsDecoration private constructor(
     private val context: Context, private var margins: Margins, private var reverseLayout: Boolean
 ) : RecyclerView.ItemDecoration() {
 
@@ -13,39 +14,39 @@ class MarginItemDecoration private constructor(
         context, Margins(0, 0, 0, 0), false
     )
 
-    fun setTopMargin(value: Int): MarginItemDecoration {
-        margins.top = value.toPx(context)
+    fun setTopMargin(value: Int): ItemMarginsDecoration {
+        margins.top = UiUtils.toPx(context, value)
         return this
     }
 
-    fun setBottomMargin(value: Int): MarginItemDecoration {
-        margins.bottom = value.toPx(context)
+    fun setBottomMargin(value: Int): ItemMarginsDecoration {
+        margins.bottom = UiUtils.toPx(context, value)
         return this
     }
 
-    fun setVerticalMargin(value: Int): MarginItemDecoration {
-        margins.top = value.toPx(context)
-        margins.bottom = value.toPx(context)
+    fun setVerticalMargin(value: Int): ItemMarginsDecoration {
+        margins.top = UiUtils.toPx(context, value)
+        margins.bottom = UiUtils.toPx(context, value)
         return this
     }
 
-    fun setLeftMargin(value: Int): MarginItemDecoration {
-        margins.left = value.toPx(context)
+    fun setLeftMargin(value: Int): ItemMarginsDecoration {
+        margins.left = UiUtils.toPx(context, value)
         return this
     }
 
-    fun setRightMargin(value: Int): MarginItemDecoration {
-        margins.right = value.toPx(context)
+    fun setRightMargin(value: Int): ItemMarginsDecoration {
+        margins.right = UiUtils.toPx(context, value)
         return this
     }
 
-    fun setHorizontalMargin(value: Int): MarginItemDecoration {
-        margins.left = value.toPx(context)
-        margins.right = value.toPx(context)
+    fun setHorizontalMargin(value: Int): ItemMarginsDecoration {
+        margins.left = UiUtils.toPx(context, value)
+        margins.right = UiUtils.toPx(context, value)
         return this
     }
 
-    fun setReverseLayout(value: Boolean): MarginItemDecoration {
+    fun setReverseLayout(value: Boolean): ItemMarginsDecoration {
         reverseLayout = value
         return this
     }
@@ -71,6 +72,9 @@ class MarginItemDecoration private constructor(
     }
 
     private data class Margins(
-        var top: Int, var bottom: Int, var left: Int, var right: Int
+        var top: Int,
+        var bottom: Int,
+        var left: Int,
+        var right: Int
     )
 }

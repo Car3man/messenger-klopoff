@@ -1,21 +1,23 @@
-package com.klopoff.messenger_klopoff.HomeActivity.NewChatFragment
+package com.klopoff.messenger_klopoff.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.klopoff.messenger_klopoff.models.Person
 import com.klopoff.messenger_klopoff.R
-import com.klopoff.messenger_klopoff.databinding.ItemFoundedPersonBinding
+import com.klopoff.messenger_klopoff.databinding.ItemPersonBinding
+import com.klopoff.messenger_klopoff.fragments.CreateChatFragment
 
-class FoundedPersonAdapter(
-    private val foundedPersons: MutableList<FoundedPerson>
-) : RecyclerView.Adapter<FoundedPersonAdapter.ViewHolder>() {
+class PersonAdapter(
+    private val persons: MutableList<Person>
+) : RecyclerView.Adapter<PersonAdapter.ViewHolder>() {
 
-    private var itemClickListener: NewChatFragment.FoundedPersonItemClickListener? = null
+    private var itemClickListener: CreateChatFragment.PersonItemClickListener? = null
 
     inner class ViewHolder(
-        private val itemBinding: ItemFoundedPersonBinding
+        private val itemBinding: ItemPersonBinding
     ) : RecyclerView.ViewHolder(itemBinding.root) {
-        fun bind(foundedPerson: FoundedPerson) {
+        fun bind(foundedPerson: Person) {
             itemBinding.tvUsername.text = foundedPerson.userName
 
             if (foundedPerson.userAvatar != null) {
@@ -29,21 +31,20 @@ class FoundedPersonAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view =
-            ItemFoundedPersonBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val view = ItemPersonBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val foundedPerson = foundedPersons[position]
-        holder.bind(foundedPerson)
+        val person = persons[position]
+        holder.bind(person)
     }
 
     override fun getItemCount(): Int {
-        return foundedPersons.size
+        return persons.size
     }
 
-    fun setItemClickListener(listener: NewChatFragment.FoundedPersonItemClickListener?) {
+    fun setItemClickListener(listener: CreateChatFragment.PersonItemClickListener?) {
         itemClickListener = listener
     }
 }

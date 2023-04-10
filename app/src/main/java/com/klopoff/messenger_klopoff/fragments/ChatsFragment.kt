@@ -1,4 +1,4 @@
-package com.klopoff.messenger_klopoff.HomeActivity.ChatsFragment
+package com.klopoff.messenger_klopoff.fragments
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -14,7 +14,9 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import com.klopoff.messenger_klopoff.Utils.MarginItemDecoration
+import com.klopoff.messenger_klopoff.models.Chat
+import com.klopoff.messenger_klopoff.adapters.ChatAdapter
+import com.klopoff.messenger_klopoff.decorations.ItemMarginsDecoration
 import com.klopoff.messenger_klopoff.databinding.FragmentChatsBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -38,7 +40,7 @@ class ChatsFragment private constructor(context: Context) : Fragment() {
         val layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         binding.recyclerView.layoutManager = layoutManager
         binding.recyclerView.addItemDecoration(
-            MarginItemDecoration(requireContext())
+            ItemMarginsDecoration(requireContext())
                 .setReverseLayout(layoutManager.reverseLayout)
                 .setVerticalMargin(16)
         )
@@ -59,7 +61,6 @@ class ChatsFragment private constructor(context: Context) : Fragment() {
         newChatButtonClickListener = listener
     }
 
-    @SuppressLint("NotifyDataSetChanged")
     private fun loadChats() {
         lifecycleScope.launch(Dispatchers.IO) {
             val loadedChats = database.reference

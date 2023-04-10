@@ -1,8 +1,9 @@
-package com.klopoff.messenger_klopoff.OnBoardActivity
+package com.klopoff.messenger_klopoff.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.klopoff.messenger_klopoff.models.OnBoardPage
 import com.klopoff.messenger_klopoff.databinding.ItemOnboardPageBinding
 
 class OnBoardPageAdapter(
@@ -19,8 +20,7 @@ class OnBoardPageAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OnBoardPageViewHolder {
-        val view =
-            ItemOnboardPageBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val view = ItemOnboardPageBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return OnBoardPageViewHolder(view)
     }
 

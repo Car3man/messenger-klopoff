@@ -1,14 +1,17 @@
-package com.klopoff.messenger_klopoff.HomeActivity.ChatsFragment
+package com.klopoff.messenger_klopoff.adapters
 
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.klopoff.messenger_klopoff.models.Chat
 import com.klopoff.messenger_klopoff.R
 import com.klopoff.messenger_klopoff.databinding.ItemChatBinding
+import com.klopoff.messenger_klopoff.fragments.ChatsFragment
 
 class ChatAdapter(
-    private val context: Context, private val chats: List<Chat>
+    private val context: Context,
+    private val chats: List<Chat>
 ) : RecyclerView.Adapter<ChatAdapter.ViewHolder>() {
 
     private var itemClickListener: ChatsFragment.ChatItemClickListener? = null
